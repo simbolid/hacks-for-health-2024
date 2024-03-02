@@ -103,7 +103,20 @@ exports.login = async (req, res) => {
     }
     
 };
-
+exports.getProfile = async (req, res) => {  
+  const userId = req.params.userId;
+  try{
+    const user = await userRepo.findUser(userId);
+    if(user) {
+      res.status(200).send(user);
+    } else {
+      res.status(400).send('User not found');
+    }
+  }catch (err){
+    console.error('Error in getting the user', err);
+    res.status(400).send('Error in getting the user');
+  }
+};
 exports.updateProfile = async (req, res) => {
     const { username, password, email } = req.body;
     if(!username || !password) {
