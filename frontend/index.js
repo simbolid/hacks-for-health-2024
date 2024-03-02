@@ -20,6 +20,15 @@ function getUserLocation() {
   });
 }
 
+function addTitleOverlay(map, titleText) {
+    const titleOverlayDiv = document.createElement('div');
+    titleOverlayDiv.classList.add('map-title-overlay');
+    titleOverlayDiv.textContent = titleText;
+
+    // Set the overlay position
+    map.controls[google.maps.ControlPosition.TOP_CENTER].push(titleOverlayDiv);
+}
+
 async function initMap() {
   const { Map } = await google.maps.importLibrary("maps");
 
@@ -39,6 +48,8 @@ async function initMap() {
     disableDefaultUI: true,
     zoomControl: true,
   });
+
+  addTitleOverlay(map, "Solace Space")
 }
 
 initMap();
