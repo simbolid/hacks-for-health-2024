@@ -31,7 +31,9 @@ function addTitleOverlay(map, titleText) {
 
 async function initMap() {
   const { Map, InfoWindow } = await google.maps.importLibrary("maps");
-  const { AdvancedMarkerElement } = await google.maps.importLibrary("marker");
+  const { AdvancedMarkerElement, PinElement } = await google.maps.importLibrary(
+    "marker"
+  );
 
   let mapCenter;
 
@@ -67,10 +69,18 @@ async function initMap() {
   const infoWindow = new InfoWindow();  // shared between markers
 
   for (const msg of messages) {
+    const pin = new PinElement({
+      background: "#122A40",
+      borderColor: "#091520",
+      glyph: "",
+      scale: 0.8
+    });
+
     const marker = new AdvancedMarkerElement({
       map,
       position: msg.position,
       title: msg.message,
+      content: pin.element
     });
 
     marker.addListener("click", () => {
