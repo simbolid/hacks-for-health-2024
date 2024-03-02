@@ -1,10 +1,10 @@
 // src/models/Post.js
-
 const mongoose = require('mongoose');
 
 const postSchema = new mongoose.Schema({
-  title: String,
-  content: String,
+    id: String,
+    content: String,
+    likes: Number,
   // Add other fields as needed
 });
 
