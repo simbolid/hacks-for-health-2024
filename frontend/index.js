@@ -1,5 +1,3 @@
-let map;
-
 function getUserLocation() {
   return new Promise((resolve, reject) => {
     if (!navigator.geolocation) {
@@ -29,6 +27,13 @@ function addTitleOverlay(map, titleText) {
     map.controls[google.maps.ControlPosition.TOP_CENTER].push(titleOverlayDiv);
 }
 
+function addNewMarkerButton(map) {
+  const addMarkerButton = document.createElement('img');
+  addMarkerButton.src = './assets/plus-circle-outline.png';
+  addMarkerButton.classList.add('map-add-marker-btn');
+  map.controls[google.maps.ControlPosition.TOP_RIGHT].push(addMarkerButton);
+}
+
 async function initMap() {
   const { Map, InfoWindow } = await google.maps.importLibrary("maps");
   const { AdvancedMarkerElement, PinElement } = await google.maps.importLibrary(
@@ -40,19 +45,9 @@ async function initMap() {
   try {
     mapCenter = await getUserLocation();
   } catch(error) {
-    mapCenter = { lat: -34.397, lng: 150.644 }; // documentation default
+    mapCenter = { lat: 40.62966, lng: -75.37247 };  // liberty high school
     console.error(error.message);
   }
-
-  map = new Map(document.getElementById("map"), {
-    mapId: "2dc738ddf4d518a4",
-    center: mapCenter,
-    zoom: 14,
-    disableDefaultUI: true,
-    zoomControl: true,
-  });
-
-  addTitleOverlay(map, "Solace Space")
 
   const messages = [
     {
@@ -65,6 +60,17 @@ async function initMap() {
       message: "I hate it here.",
     },
   ];
+
+  const map = new Map(document.getElementById("map"), {
+    mapId: "2dc738ddf4d518a4",
+    center: mapCenter,
+    zoom: 14,
+    disableDefaultUI: true,
+    zoomControl: true,
+  });
+
+  addTitleOverlay(map, "Solace Space");
+  addNewMarkerButton(map);
 
   const infoWindow = new InfoWindow();  // shared between markers
 
