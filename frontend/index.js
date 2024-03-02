@@ -35,6 +35,8 @@ async function initMap() {
   map = new Map(document.getElementById("map"), {
     center: mapCenter,
     zoom: 12,
+    disableDefaultUI: true,
+    zoomControl: true,
   });
 }
 
