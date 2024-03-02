@@ -33,6 +33,7 @@ async function initMap() {
   }
 
   map = new Map(document.getElementById("map"), {
+    mapId: "2dc738ddf4d518a4",
     center: mapCenter,
     zoom: 12,
     disableDefaultUI: true,
