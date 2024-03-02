@@ -2,7 +2,12 @@
 
 const mongoose = require('mongoose');
 
-mongoose.connect('mongodb://localhost:27017/your-database', {
+const dev_db_url =
+  "mongodb+srv://dbuser:admin@cluster0.afn1qa6.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
+
+const url = "mongodb+srv://dbuser:admin@cluster0.afn1qa6.mongodb.net/"
+
+mongoose.connect(dev_db_url, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
   useCreateIndex: true, // Added to suppress deprecation warning
