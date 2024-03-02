@@ -30,7 +30,8 @@ function addTitleOverlay(map, titleText) {
 }
 
 async function initMap() {
-  const { Map } = await google.maps.importLibrary("maps");
+  const { Map, InfoWindow } = await google.maps.importLibrary("maps");
+  const { AdvancedMarkerElement } = await google.maps.importLibrary("marker");
 
   let mapCenter;
 
@@ -50,6 +51,34 @@ async function initMap() {
   });
 
   addTitleOverlay(map, "Solace Space")
+
+  const messages = [
+    {
+      position: { lat: mapCenter.lat, lng: mapCenter.lng },
+      message: "I love it here.",
+    },
+
+    {
+      position: { lat: mapCenter.lat + .01, lng: mapCenter.lng - .01 },
+      message: "I hate it here.",
+    },
+  ];
+
+  const infoWindow = new InfoWindow();  // shared between markers
+
+  for (const msg of messages) {
+    const marker = new AdvancedMarkerElement({
+      map,
+      position: msg.position,
+      title: msg.message,
+    });
+
+    marker.addListener("click", () => {
+      infoWindow.close();
+      infoWindow.setContent(marker.title);
+      infoWindow.open(marker.map, marker);
+    });
+  }
 }
 
 initMap();
