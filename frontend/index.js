@@ -11,11 +11,18 @@ const { AdvancedMarkerElement, PinElement } = await google.maps.importLibrary(
  */
 let map;
 let mapCenter;
-let tempMarkerLocation = null;  // used when setting the location for a new msg
+let isFormActive = false;
+let tempMarker;
+const tempMarkerPin = new PinElement({
+  background: '#F29718',
+  borderColor: '#d4810c',
+  glyph: '',
+  scale: 0.8
+});
 
 try {
   mapCenter = await getUserLocation();
-} catch(error) {
+} catch (error) {
   mapCenter = { lat: 40.62966, lng: -75.37247 };  // liberty high school
   console.error(error.message);
 }
@@ -57,6 +64,19 @@ function getUserLocation() {
   });
 }
 
+function toggleForm() {
+  if (isFormActive) {
+    tempMarker.map = null;
+    tempMarker = null;
+    document.getElementById('markerForm').classList.remove('active');
+    document.getElementById('message').value = '';
+    isFormActive = false;
+  } else {
+    document.getElementById('markerForm').classList.add('active');
+    isFormActive = true;
+  }
+}
+
 function addTitleOverlay(titleText) {
   const titleOverlayDiv = document.createElement('div');
   titleOverlayDiv.classList.add('map-title-overlay');
@@ -72,16 +92,30 @@ function addNewMarkerButton() {
   addMarkerButton.classList.add('map-add-marker-btn');
 
   addMarkerButton.onclick = () => {
-      document.getElementById('markerForm').classList.add('active');
+    toggleForm();
   };
 
   document.getElementById('closeFormBtn').onclick = () => {
-      document.getElementById('markerForm').classList.remove('active');
+    toggleForm();
   };
 
   document.querySelector('#submitButton').addEventListener('click', handleFormSubmit);
 
   map.controls[google.maps.ControlPosition.TOP_RIGHT].push(addMarkerButton);
+}
+
+function placeTempMarker(position) {
+  // If a temporary marker already exists, move it
+  if (tempMarker) {
+    tempMarker.position = position;
+  } else {
+    // Create a new temporary marker at the clicked location
+    tempMarker = new AdvancedMarkerElement({
+      position,
+      map,
+      content: tempMarkerPin.element
+    });
+  }
 }
 
 function placeMarker(position, message) {
@@ -113,13 +147,9 @@ function placeMarker(position, message) {
  */
 function handleFormSubmit() {
   const message = document.getElementById('message').value;
-  if (tempMarkerLocation && message) {
-    placeMarker(tempMarkerLocation, message)
-    
-    // Reset temp location and hide form
-    tempMarkerLocation = null;
-    document.getElementById('markerForm').classList.remove('active');
-    document.getElementById('message').value = ''; // Clear the message field
+  if (tempMarker && message) {
+    placeMarker(tempMarker.position, message);
+    toggleForm();
   }
 }
 
@@ -136,8 +166,12 @@ function initMap() {
   addNewMarkerButton();
 
   // listen for map clicks to set the temporary marker location
-  map.addListener('click', function(e) {
-    tempMarkerLocation = e.latLng;
+  map.addListener('click', function (e) {
+    // tempMarkerLocation = e.latLng;
+    const isFormActive = document.getElementById('markerForm').classList.contains('active');
+    if (isFormActive) {
+      placeTempMarker(e.latLng);
+    }
   });
 
   for (const msg of messages) {
