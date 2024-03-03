@@ -8,6 +8,19 @@
   </head>
   <body>
     <div id="map"></div>
+    <div id="markerForm" class="slide-in-form">
+      <button id="closeFormBtn" type="button">&times;</button>
+      <div class="form-content">
+        <h2>ADD TO THE MAP</h2>
+        <p>1. Click on the location where you want to post your message.</p>
+        <p>2. Share your message in the text box below.</p>
+        <p>3. Click the 'Submit' button.</p>
+        <form>
+            <textarea id="message" name="message" placeholder="Type your message here..."></textarea>
+            <button id="submitButton" type="button">Submit</button>
+        </form>
+      </div>
+    </div>
 
     <!-- prettier-ignore -->
     <script>

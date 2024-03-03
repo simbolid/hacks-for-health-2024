@@ -1,3 +1,42 @@
+/*
+ * Google Map Javascript API Imports
+ */
+const { Map, InfoWindow } = await google.maps.importLibrary("maps");
+const { AdvancedMarkerElement, PinElement } = await google.maps.importLibrary(
+  "marker"
+);
+
+/*
+ * Globals
+ */
+let map;
+let mapCenter;
+let tempMarkerLocation = null;  // used when setting the location for a new msg
+
+try {
+  mapCenter = await getUserLocation();
+} catch(error) {
+  mapCenter = { lat: 40.62966, lng: -75.37247 };  // liberty high school
+  console.error(error.message);
+}
+
+const messages = [
+  {
+    position: { lat: mapCenter.lat, lng: mapCenter.lng },
+    message: "I love it here.",
+  },
+
+  {
+    position: { lat: mapCenter.lat + .01, lng: mapCenter.lng - .01 },
+    message: "I hate it here.",
+  },
+];
+
+const messageWindow = new InfoWindow();  // shared between markers
+
+/*
+ * Helper Functions
+ */
 function getUserLocation() {
   return new Promise((resolve, reject) => {
     if (!navigator.geolocation) {
@@ -18,50 +57,74 @@ function getUserLocation() {
   });
 }
 
-function addTitleOverlay(map, titleText) {
-    const titleOverlayDiv = document.createElement('div');
-    titleOverlayDiv.classList.add('map-title-overlay');
-    titleOverlayDiv.textContent = titleText;
+function addTitleOverlay(titleText) {
+  const titleOverlayDiv = document.createElement('div');
+  titleOverlayDiv.classList.add('map-title-overlay');
+  titleOverlayDiv.textContent = titleText;
 
-    // Set the overlay position
-    map.controls[google.maps.ControlPosition.TOP_CENTER].push(titleOverlayDiv);
+  // Set the overlay position
+  map.controls[google.maps.ControlPosition.TOP_CENTER].push(titleOverlayDiv);
 }
 
-function addNewMarkerButton(map) {
+function addNewMarkerButton() {
   const addMarkerButton = document.createElement('img');
   addMarkerButton.src = './assets/plus-circle-outline.png';
   addMarkerButton.classList.add('map-add-marker-btn');
+
+  addMarkerButton.onclick = () => {
+      document.getElementById('markerForm').classList.add('active');
+  };
+
+  document.getElementById('closeFormBtn').onclick = () => {
+      document.getElementById('markerForm').classList.remove('active');
+  };
+
+  document.querySelector('#submitButton').addEventListener('click', handleFormSubmit);
+
   map.controls[google.maps.ControlPosition.TOP_RIGHT].push(addMarkerButton);
 }
 
-async function initMap() {
-  const { Map, InfoWindow } = await google.maps.importLibrary("maps");
-  const { AdvancedMarkerElement, PinElement } = await google.maps.importLibrary(
-    "marker"
-  );
+function placeMarker(position, message) {
+  const pin = new PinElement({
+    background: "#122A40",
+    borderColor: "#091520",
+    glyph: "",
+    scale: 0.8
+  });
 
-  let mapCenter;
+  const marker = new AdvancedMarkerElement({
+    map,
+    position,
+    title: message,
+    content: pin.element
+  });
 
-  try {
-    mapCenter = await getUserLocation();
-  } catch(error) {
-    mapCenter = { lat: 40.62966, lng: -75.37247 };  // liberty high school
-    console.error(error.message);
+  marker.addListener("click", () => {
+    messageWindow.close();
+    messageWindow.setContent(
+      `<div class="info-window-content">${marker.title}</div>`
+    );
+    messageWindow.open(marker.map, marker);
+  });
+}
+
+/*
+ * Driver Code
+ */
+function handleFormSubmit() {
+  const message = document.getElementById('message').value;
+  if (tempMarkerLocation && message) {
+    placeMarker(tempMarkerLocation, message)
+    
+    // Reset temp location and hide form
+    tempMarkerLocation = null;
+    document.getElementById('markerForm').classList.remove('active');
+    document.getElementById('message').value = ''; // Clear the message field
   }
+}
 
-  const messages = [
-    {
-      position: { lat: mapCenter.lat, lng: mapCenter.lng },
-      message: "I love it here.",
-    },
-
-    {
-      position: { lat: mapCenter.lat + .01, lng: mapCenter.lng - .01 },
-      message: "I hate it here.",
-    },
-  ];
-
-  const map = new Map(document.getElementById("map"), {
+function initMap() {
+  map = new Map(document.getElementById("map"), {
     mapId: "2dc738ddf4d518a4",
     center: mapCenter,
     zoom: 14,
@@ -69,31 +132,16 @@ async function initMap() {
     zoomControl: true,
   });
 
-  addTitleOverlay(map, "Solace Space");
-  addNewMarkerButton(map);
+  addTitleOverlay("Solace Space");
+  addNewMarkerButton();
 
-  const infoWindow = new InfoWindow();  // shared between markers
+  // listen for map clicks to set the temporary marker location
+  map.addListener('click', function(e) {
+    tempMarkerLocation = e.latLng;
+  });
 
   for (const msg of messages) {
-    const pin = new PinElement({
-      background: "#122A40",
-      borderColor: "#091520",
-      glyph: "",
-      scale: 0.8
-    });
-
-    const marker = new AdvancedMarkerElement({
-      map,
-      position: msg.position,
-      title: msg.message,
-      content: pin.element
-    });
-
-    marker.addListener("click", () => {
-      infoWindow.close();
-      infoWindow.setContent(marker.title);
-      infoWindow.open(marker.map, marker);
-    });
+    placeMarker(msg.position, msg.message);
   }
 }
 
