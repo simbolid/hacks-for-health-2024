@@ -66,8 +66,10 @@ function getUserLocation() {
 
 function toggleForm() {
   if (isFormActive) {
-    tempMarker.map = null;
-    tempMarker = null;
+    if (tempMarker) {
+      tempMarker.map = null;
+      tempMarker = null;
+    }
     document.getElementById('markerForm').classList.remove('active');
     document.getElementById('message').value = '';
     isFormActive = false;
