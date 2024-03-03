@@ -31,8 +31,8 @@ exports.getPostById = async (req, res) => {
 exports.createPost = async (req, res) => {
   // Implement logic to create a new post
   try {
-    const { title, content,location } = req.body;
-    const newPost = new Post({ title, content,location });
+    const { id, content, likes, lat, leg} = req.body;
+    const newPost = new Post({ id, content, likes, lat, leg });
     const savedPost = await newPost.save();
     res.status(201).json(savedPost);
   } catch (error) {
@@ -44,9 +44,9 @@ exports.updatePost = async (req, res) => {
   // Implement logic to update a post
   try {
     const postId = req.params.postId;
-    const { title, content,location } = req.body;
+    const { id, content, likes, lat, leg } = req.body;
 
-    const updatedPost = await Post.findByIdAndUpdate(postId, { title, content,location }, { new: true });
+    const updatedPost = await Post.findByIdAndUpdate(postId, { id, content, likes, lat, leg }, { new: true });
 
     if (!updatedPost) {
       return res.status(404).json({ message: 'Post not found' });

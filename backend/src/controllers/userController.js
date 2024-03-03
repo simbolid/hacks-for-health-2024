@@ -1,7 +1,7 @@
 //signController.js
 
 const { UserRefreshClient } = require('google-auth-library');
-const User = require('../models/user');
+const User = require('../models/User');
 const {OAuth2Client} = require('google-auth-library');
 
 // class UserRepo {
