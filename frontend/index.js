@@ -31,6 +31,15 @@ function addNewMarkerButton(map) {
   const addMarkerButton = document.createElement('img');
   addMarkerButton.src = './assets/plus-circle-outline.png';
   addMarkerButton.classList.add('map-add-marker-btn');
+
+  addMarkerButton.onclick = () => {
+      document.getElementById('markerForm').classList.add('active');
+  };
+
+  document.getElementById('closeFormBtn').onclick = () => {
+      document.getElementById('markerForm').classList.remove('active');
+  };
+
   map.controls[google.maps.ControlPosition.TOP_RIGHT].push(addMarkerButton);
 }
 
