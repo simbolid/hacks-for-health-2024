@@ -6,6 +6,7 @@ const postSchema = new mongoose.Schema({
     content: String,
     likes: Number,
   // Add other fields as needed
+    location: String,
 });
 
 const Post = mongoose.model('Post', postSchema);
