@@ -2,12 +2,9 @@ const express = require('express');
 const app = express();
 const admin = require("firebase-admin");
 var serviceAccount = require("/Users/junyi/Desktop/hacks-for-health-2024/backend/serviceAccountKey.json");
+const path = require('path');
 
-
-
-app.get('/', (req, res) => {
-  res.send('Hello from App Engine!');
-});
+app.use(express.static(path.join(__dirname, 'public')));
 
 const firebaseConfig = {
     apiKey: "AIzaSyBGU3jrgxvjcuTl6zpWw8Z2AYd1SBv1e_U",
