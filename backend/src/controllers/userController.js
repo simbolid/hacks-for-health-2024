@@ -1,37 +1,37 @@
 //signController.js
 
 const { UserRefreshClient } = require('google-auth-library');
-const User = require('../models/user');
+const User = require('../models/User');
 const {OAuth2Client} = require('google-auth-library');
 
-class UserRepo {
-    constructor() {
-      this.users = new User();
-    }
+// class UserRepo {
+//     constructor() {
+//       this.users = new User();
+//     }
   
-    async addUser(user) {
-      await this.users.insertOne(user);
-    }
-    async findUser(username) {
-      return await this.users.findOne({username});
-    }
-    async authenticateUser(username, password) {
-      return await this.users.findOne({username,password});
-    }
-    async updateProfile(username,password,email) {
-      const user = await this.users.findUser(username);
-      if(user && user.password === password) {
-        // user.avatar = avatar; 
-        user.email = email;
-        // await this.users.updateOne({username : username}, {$set: {avatar: avatar}});
-        await this.users.updateOne({username : username}, {$set: {email: email}});  
-        return true;
-      }
-      return false;
+//     async addUser(user) {
+//       await this.users.insertOne(user);
+//     }
+//     async findUser(username) {
+//       return await User.find({username});
+//     }
+//     async authenticateUser(username, password) {
+//       return await this.users.findOne({username,password});
+//     }
+//     async updateProfile(username,password,email) {
+//       const user = await this.users.findUser(username);
+//       if(user && user.password === password) {
+//         // user.avatar = avatar; 
+//         user.email = email;
+//         // await this.users.updateOne({username : username}, {$set: {avatar: avatar}});
+//         await this.users.updateOne({username : username}, {$set: {email: email}});  
+//         return true;
+//       }
+//       return false;
   
-    }
+//     }
   
-  }
+//   }
 const userRepo = new UserRepo();
 exports.init = async (req, res) => {
     res.redirect('/login');
@@ -40,13 +40,14 @@ exports.init = async (req, res) => {
 exports.signup = async (req, res) => {
     const { username, password} = req.body;
 
+
     try{
-      const existUser = await userRepo.findUser({username});
+      const existUser = await User.findOne({username});
       if(existUser){
         res.status(400).send('User already exists');
       }else{
-        const user = new userRepo({username, password, email: ''});
-        await user.save();
+        const newUser = new User({username, password, email: ''});
+        await newUser.save();
         res.status(200).send('User created');
       }
   
@@ -73,7 +74,7 @@ exports.login = async (req, res) => {
           });
           const payload = ticket.getPayload();
           const userid = payload['sub'];
-          const existUser = await userRepo.findUser({username:userid});
+          const existUser = await User.findOne({username:userid});
           if(existUser){
             res.status(200).send('User authenticated');
           }else {
@@ -87,8 +88,8 @@ exports.login = async (req, res) => {
       }
     }else{
       try{
-        const user = await userRepo.findUser({username,password});
-      if(user && userRepo.authenticateUser(username,password)) {
+        const user = await User.findOne({username,password});
+      if(user) {
         res.status(200).send('User authenticated');
       } else if(!user){
         res.redirect('/signup');
@@ -106,7 +107,7 @@ exports.login = async (req, res) => {
 exports.getProfile = async (req, res) => {  
   const userId = req.params.userId;
   try{
-    const user = await userRepo.findUser(userId);
+    const user = await User.findOne(userId);
     if(user) {
       res.status(200).send(user);
     } else {
@@ -118,13 +119,21 @@ exports.getProfile = async (req, res) => {
   }
 };
 exports.updateProfile = async (req, res) => {
-    const { username, password, email } = req.body;
-    if(!username || !password) {
-      res.status(400).send('Username and password are required');
-    }
-    if(await userRepo.updateProfile(username,password,email)) {
+  const { username, password, email } = req.body;
+  if (!username || !password) {
+    res.status(400).send('Username and password are required');
+  }
+  try {
+    const user = await User.findOne({ username });
+    if (user && user.password === password) {
+      user.email = email;
+      await user.save();
       res.status(200).send('Profile updated');
     } else {
       res.status(400).send('Invalid username or password');
     }
+  } catch (err) {
+    console.error('Error in updating the profile', err);
+    res.status(400).send('Error in updating the profile');
+  }
 };
