@@ -1,7 +1,7 @@
 const express = require('express');
 const app = express();
 const admin = require("firebase-admin");
-var serviceAccount = require("/Users/junyi/Desktop/hacks-for-health-2024/backend/serviceAccountKey.json");
+var serviceAccount = require("./serviceAccountKey.json");
 const path = require('path');
 
 app.use(express.static(path.join(__dirname, 'public')));
