@@ -26,9 +26,9 @@ admin.initializeApp(firebaseConfig)
 // const mongoose = require('mongoose');
 
 // const dev_db_url =
-//   "mongodb+srv://dbuser:admin@cluster0.afn1qa6.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
+//   "your-mongodb-urll";
 
-// const url = "mongodb+srv://dbuser:admin@cluster0.afn1qa6.mongodb.net/"
+// const url = "your-mongodb-url"
 
 // mongoose.connect(dev_db_url);
 
