@@ -7,7 +7,7 @@ const path = require('path');
 app.use(express.static(path.join(__dirname, 'public')));
 
 const firebaseConfig = {
-    apiKey: "AIzaSyBGU3jrgxvjcuTl6zpWw8Z2AYd1SBv1e_U",
+    apiKey: "your private api key",
     authDomain: "chat-e6d6a.firebaseapp.com",
     projectId: "chat-e6d6a",
     storageBucket: "chat-e6d6a.appspot.com",

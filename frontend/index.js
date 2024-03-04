@@ -164,7 +164,7 @@ function initMap() {
     zoomControl: true,
   });
 
-  addTitleOverlay("Solace Space");
+  addTitleOverlay("SafeSpace");
   addNewMarkerButton();
 
   // listen for map clicks to set the temporary marker location
